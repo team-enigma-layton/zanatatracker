@@ -38,7 +38,8 @@ $('#submit').click(function() {
                     'Accept': 'application/json',
                     'X-Auth-User': v('username'),
                     'X-Auth-Token': v('userToken'),
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Access-Control-Request-Headers': 'x-requested-with'
                 },
                 xhrFields: {
                     withCredentials: true
@@ -88,7 +89,8 @@ $('#submit').click(function() {
                 'Accept': 'application/json',
                 'X-Auth-User': v('username'),
                 'X-Auth-Token': v('userToken'),
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Access-Control-Request-Headers': 'x-requested-with'
             },
             xhrFields: {
                 withCredentials: true
@@ -444,7 +446,7 @@ function v(name) {
         case 'url':
             var url = $('#zanataURL').val();
             if(url == '') url = 'https://translate.zanata.org/';
-            if(!url.endsWith('/')) url.concat('/');
+            if(!url.endsWith('/')) url = url.concat('/');
             return url;
         case 'date':
             return $('#startYear').val() + '-' + $('#startMonth').val() + '-' + $('#startDay').val()
