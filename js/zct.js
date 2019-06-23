@@ -12,7 +12,7 @@ $('#submit').click(function() {
                     'Accept': 'application/json',
                     'X-Auth-User': v('username'),
                     'X-Auth-Token': v('userToken'),
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
                 xhrFields: {
@@ -25,10 +25,10 @@ $('#submit').click(function() {
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(data, status, _) {
-                    console.log('Data Received:' + data);
+                    console.log('Data Received:' + data.responseText);
                 },
                 error: function(data, status, _) {
-                    console.log('Unexpected Error, code:' + status + ', data:' + data);
+                    console.log('Unexpected Error, code:' + data.status + ', message:' + data.responseText);
                 }
             })
         });
@@ -45,7 +45,7 @@ $('#submit').click(function() {
                 'Accept': 'application/json',
                 'X-Auth-User': v('username'),
                 'X-Auth-Token': v('userToken'),
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
             xhrFields: {
@@ -59,10 +59,10 @@ $('#submit').click(function() {
             dataType: 'json',
             contentType: 'application/json',
             success: function(data, status, _) {
-                console.log('Data Received:' + data);
+                console.log('Data Received:' + JSON.stringify(data));
             },
             error: function(data, status, _) {
-                console.log('Unexpected Error, code:' + status + ', data:' + data);
+                console.log('Unexpected Error, code:' + data.status + ', message:' + data.responseText);
             }
         })
     }
@@ -137,7 +137,7 @@ function v(name) {
     switch(name) {
         case 'url':
             var url = $('#zanataURL').val();
-            if(url == '') url = 'https://translate.zanata.org/';
+            if(url == '') url = 'http://translate.zanata.org/';
             if(!url.endsWith('/')) url.concat('/');
             return url;
         case 'date':
