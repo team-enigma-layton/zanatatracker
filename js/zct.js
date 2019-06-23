@@ -1,5 +1,16 @@
-$('#submit').click(function() {
-    if(!checkValues()) return false;
+$(document).ready(function() {  // or $(function()
+    init();
+});
+
+var elements = ['zanataURL', 'username', 'userToken', 'projectName', 'versionName', 'locale', 'targetUserName']
+
+function init() {
+    $.each(elements, function (_, r) {
+        $("#" + r).val(getCookie(r));
+    });
+}
+
+$('#submit').click(function () {
     var tu = v('targetUsername');
     var date = v('date');
     $('.loading').removeClass("d-none");
@@ -105,6 +116,10 @@ $('#submit').click(function() {
         })
     }
     
+  
+    $.each(elements, function (_, r) {
+        setCookie(r, v(r), 7);
+    });
 })
 
 $('#close-404').on('click', function() {
@@ -211,5 +226,43 @@ function v(name) {
             return $('#wordCheck').prop('checked');
         default:
             return $('#' + name).val();
+    }
+}
+
+$('#versionName').change(function () {
+    console.log('versionName changed');
+
+    fetch(v('url') + 'project/' + v('projectName') + '/version/' + v('versionName') + '/locales', {mode: 'cors'})
+    .then(function(response) {
+        // Convert to JSON
+        return response.json();
+    }).then(function(j) {
+        // Yay, `j` is a JavaScript object
+        console.log(JSON.stringify(j));
+    }).catch(function(error) {
+        console.log('Request failed', error)
+    });
+});
+
+function setCookie(cookie_name, value, days) {
+    var exdate = new Date();
+    exdate.setDate(exdate.getDate() + days);
+  
+    var cookie_value = escape(value) + ((days == null) ? '' : ';    expires=' + exdate.toUTCString());
+    document.cookie = cookie_name + '=' + cookie_value;
+}
+
+function getCookie(cookie_name) {
+    var x, y;
+    var val = document.cookie.split(';');
+
+    for (var i = 0; i < val.length; i++) {
+        x = val[i].substr(0, val[i].indexOf('='));
+        y = val[i].substr(val[i].indexOf('=') + 1);
+      
+        x = x.replace(/^\s+|\s+$/g, '');
+        if (x == cookie_name) {
+            return unescape(y);
+        }
     }
 }
