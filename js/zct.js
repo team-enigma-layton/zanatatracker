@@ -7,12 +7,16 @@ $('#submit').click(function() {
             var url = v('url') + 'rest/stats/project/' + v('projectName') + '/version/' + v('versionName') + '/contributor/' + u + '/' + v('date');
             $.ajax({
                 url: url,
+                crossDomain: true,
                 headers: {
                     'Accept': 'application/json',
                     'X-Auth-User': v('username'),
                     'X-Auth-Token': v('userToken'),
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'Access-Control-Request-Headers': 'x-requested-with'
+                    'Access-Control-Allow-Origin': '*'
+                },
+                xhrFields: {
+                    withCredentials: true
                 },
                 data: {
                     locale: v('locale'),
@@ -36,12 +40,16 @@ $('#submit').click(function() {
         }
         $.ajax({
             url: url,
+            crossDomain: true,
             headers: {
                 'Accept': 'application/json',
                 'X-Auth-User': v('username'),
                 'X-Auth-Token': v('userToken'),
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'Access-Control-Request-Headers': 'x-requested-with'
+                'Access-Control-Allow-Origin': '*'
+            },
+            xhrFields: {
+                withCredentials: true
             },
             data: {
                 locale: v('locale'),
