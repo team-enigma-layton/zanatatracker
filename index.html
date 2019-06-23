@@ -17,8 +17,8 @@
     </head>
     <body>
         <nav class="navbar navbar-dark bg-green">
-            <a class="navbar-brand" href="#"><img class="mr-2" src="./img/logo.png" width="35px">Zanata Contribution Tracker</a>
-            <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+            <a class="navbar-brand" href="#"><img class="mr-2" src="./img/logo.png" width="35px"><span class="d-inline d-sm-none">ZCT</span><span class="d-none d-sm-inline">Zanata Contribution Tracker</span></a>
+            <ul class="navbar-nav flex-row ml-md-auto d-flex">
                 <li class="nav-item">
                     <a class="nav-link p-2" href="https://github.com/team-enigma-layton/zanatatracker" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github mr-1"></i></a>
                 </li>
@@ -31,25 +31,25 @@
             <div class="card mt-1">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-auto">
+                        <div class="col-lg-2">
                             <h3 class="card-title">사용자 정보</h3>
                         </div>
                         <div class="form-group row col-lg">
-                            <label for="zanataURL">자나타 URL</label>
-                            <div class="col">
+                            <div class="col-sm-3"><label for="zanataURL">자나타 URL</label></div>
+                            <div class="col-sm">
                                 <input type="text" class="form-control" id="zanataURL" aria-describedby="zanataURLHelp" placeholder="https://translate.zanata.org">
                                 <small id="zanataURLHelp" class="form-text text-muted">레드햇에서 호스팅하는 호스트를 사용할 경우 입력할 필요가 없습니다.</small>
                             </div>
                         </div>
                         <div class="form-group row col-lg">
-                            <label for="username">사용자 명</label>
-                            <div class="col">
+                            <div class="col-sm-3"><label for="username">사용자</label></div>
+                            <div class="col-sm">
                                 <input type="text" class="form-control" id="username" placeholder="사용자 명을 입력하세요...">
                             </div>
                         </div>
                         <div class="form-group row col-lg">
-                            <label for="userToken">토큰</label>
-                            <div class="col">
+                            <div class="col-sm-3"><label for="userToken">토큰</label></div>
+                            <div class="col-sm">
                                 <input type="text" class="form-control" id="userToken" aria-describedby="userTokenHelp" placeholder="유저 토큰을 입력하세요...">
                                 <small id="userTokenHelp" class="form-text text-muted">토큰은 대시보드&gt;설정&gt;클라이언트에서 찾을 수 있습니다.</small>
                             </div>
@@ -58,32 +58,37 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-lg-3">
                     <div class="card mt-1">
                         <div class="card-body">
                             <h3 class="card-title">액션</h3>
                             <hr>
-                                <div class="form-group">
-                                    <label for="projectName">프로젝트 명</label>
-                                    <input type="text" class="form-control" id="projectName" placeholder="프로젝트 명을 입력하세요...">
-                                </div>
-                                <div class="form-group">
-                                    <label for="versionName">버전 명</label>
-                                    <input type="text" class="form-control" id="versionName" placeholder="버전 명을 입력하세요...">
-                                </div>
-                                <div class="form-group">
-                                    <label for="locale">언어</label>
+                            <div class="form-group row">
+                                <div class="col-sm-3"><label for="projectName">프로젝트</label></div>
+                                <div class="col-sm"><input type="text" class="form-control" id="projectName" placeholder="프로젝트 명을 입력하세요..."></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-3"><label for="versionName">버전</label></div>
+                                <div class="col-sm"><input type="text" class="form-control" id="versionName" placeholder="버전 명을 입력하세요..."></div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-3"><label for="locale">언어</label></div>
+                                <div class="col-sm">
                                     <input type="text" class="form-control" id="locale" aria-describedby="localeHelp" placeholder="ko">
                                     <small id="localeHelp" class="form-text text-muted">언어는 자나타의 언어 명을 따릅니다. 입력하지 않으면 한국어(ko)를 기본값으로 합니다.</small>
                                 </div>
-                                <div class="form-group">
-                                    <label for="targetUsername">조회할 사용자 명</label>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-3"><label for="targetUsername">조회할 사용자</label></div>
+                                <div class="col-sm">
                                     <input type="text" class="form-control" id="targetUsername" aria-describedby="targetUsernameHelp" placeholder="사용자1,사용자2,사용자3">
                                     <small id="targetUsernameHelp" class="form-text text-muted">사용자 명을 입력하지 않으면 전체 버전의 통계가 제공되며, 쉼표(,)를 이용해 여러 사용자를 동시에 조회할 수 있습니다.</small>
-                                    <small id="targetUsernameHelp" class="form-text text-warning">사용자 명을 입력할 경우 조회 기간을 반드시 입력하여야 합니다!</small>
+                                    <small id="targetUsernameHelp" class="form-text text-danger">사용자 명을 입력할 경우 조회 기간을 반드시 입력하여야 합니다!</small>
                                 </div>
-                                <div class="form-group">
-                                    <label for="date">조회 기간</label>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-3"><label for="date">조회 기간</label></div>
+                                <div class="col-sm">
                                     <div class="input-group"> 
                                         <input type="text" class="form-control" id="startYear" placeholder="YYYY">
                                         <div class="input-group-prepend">
@@ -114,22 +119,23 @@
                                     </div>
                                     <small id="dateRangeHelp" class="form-text text-muted">최대 조회 기간은 365일입니다.</small>
                                 </div>
-                                <div class="form-group form-check">
-                                    <input type="checkbox" class="form-check-input" id="wordCheck">
-                                    <label class="form-check-label" for="wordCheck">Word 기반 통계 조회</label>
-                                </div>
-                                <button id="submit" class="btn btn-success">불러오기</button>
+                            </div>
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="wordCheck">
+                                <label class="form-check-label" for="wordCheck">Word 기반 통계 조회</label>
+                            </div>
+                            <button id="submit" class="btn btn-success">불러오기</button>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-9">
+                <div class="col-lg-9">
                     <div class="card text-white bg-secondary border-secondary mt-1">
                         <div class="card-header">
                             <div class="row">
-                                <div class="col-md-auto">
+                                <div class="col-sm">
                                     <h3>기여 그래프</h3>
                                 </div>
-                                <div class="col-md-auto">
+                                <div class="col-sm">
                                     <div class="dropdown graph-type float-right">
                                         <button class="btn btn-success dropdown-toggle" type="button" id="graphtypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             그래프 정보 선택

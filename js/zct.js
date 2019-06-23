@@ -4,15 +4,22 @@ $('#submit').click(function() {
     var date = v('date');
     if(tu.length > 1) {
         $.each(tu, function(_, u) {
-            var url = v('url') + 'rest/stats/project/' + v('projectName') + '/version/' + v('versionName') + '/contributor/' + u + '/' + v('date') + '&locale=' + v('locale') + '?word=' + v('wordCheck');
+            var url = v('url') + 'rest/stats/project/' + v('projectName') + '/version/' + v('versionName') + '/contributor/' + u + '/' + v('date');
             $.ajax({
                 url: url,
                 headers: {
-                    Accept: 'application/json; charset=utf-8',
+                    'Accept': 'application/json',
                     'X-Auth-User': v('username'),
                     'X-Auth-Token': v('userToken'),
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Access-Control-Request-Headers': 'x-requested-with'
                 },
+                data: {
+                    locale: v('locale'),
+                    word: v('word')
+                },
+                dataType: 'json',
+                contentType: 'application/json',
                 success: function(data, status, _) {
                     console.log('Data Received:' + data);
                 },
@@ -23,18 +30,26 @@ $('#submit').click(function() {
         });
     } else {
         if(date == '--..--') {
-            var url = v('url') + 'rest/stats/proj/' + v('projectName') + '/iter/' + v('versionName') + '&locale=' + v('locale') + '?detail=true?word=' + v('wordCheck');
+            var url = v('url') + 'rest/stats/proj/' + v('projectName') + '/iter/' + v('versionName');
         } else {
-            var url = v('url') + 'rest/stats/project/' + v('projectName') + '/version/' + v('versionName') + '/' + v('date') + '&locale=' + v('locale') + '?word=' + v('wordCheck');
+            var url = v('url') + 'rest/stats/project/' + v('projectName') + '/version/' + v('versionName') + '/' + v('date');
         }
         $.ajax({
             url: url,
             headers: {
-                Accept: 'application/json; charset=utf-8',
+                'Accept': 'application/json',
                 'X-Auth-User': v('username'),
                 'X-Auth-Token': v('userToken'),
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Access-Control-Request-Headers': 'x-requested-with'
             },
+            data: {
+                locale: v('locale'),
+                detail: true,
+                word: v('word')
+            },
+            dataType: 'json',
+            contentType: 'application/json',
             success: function(data, status, _) {
                 console.log('Data Received:' + data);
             },
@@ -129,6 +144,6 @@ function v(name) {
         case 'wordCheck':
             return $('#wordCheck').prop('checked');
         default:
-            return $('#' + name);
+            return $('#' + name).val();
     }
 }
