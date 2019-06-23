@@ -16,42 +16,65 @@ $('#submit').click(function () {
     var date = v('date');
     if(tu.length > 1) {
         $.each(tu, function(_, u) {
-            var url = v('url') + 'rest/stats/project/' + v('projectName') + '/version/' + v('versionName') + '/contributor/' + u + '/' + v('date') + '&locale=' + v('locale') + '?word=' + v('wordCheck');
+            var url = v('url') + 'rest/stats/project/' + v('projectName') + '/version/' + v('versionName') + '/contributor/' + u + '/' + v('date');
             $.ajax({
                 url: url,
+                crossDomain: true,
                 headers: {
-                    Accept: 'application/json; charset=utf-8',
+                    'Accept': 'application/json',
                     'X-Auth-User': v('username'),
                     'X-Auth-Token': v('userToken'),
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
                 },
+                xhrFields: {
+                    withCredentials: true
+                },
+                data: {
+                    locale: v('locale'),
+                    word: v('word')
+                },
+                dataType: 'json',
+                contentType: 'application/json',
                 success: function(data, status, _) {
-                    console.log('Data Received:' + data);
+                    console.log('Data Received:' + data.responseText);
                 },
                 error: function(data, status, _) {
-                    console.log('Unexpected Error, code:' + status + ', data:' + data);
+                    console.log('Unexpected Error, code:' + data.status + ', message:' + data.responseText);
                 }
             })
         });
     } else {
         if(date == '--..--') {
-            var url = v('url') + 'rest/stats/proj/' + v('projectName') + '/iter/' + v('versionName') + '&locale=' + v('locale') + '?detail=true?word=' + v('wordCheck');
+            var url = v('url') + 'rest/stats/proj/' + v('projectName') + '/iter/' + v('versionName');
         } else {
-            var url = v('url') + 'rest/stats/project/' + v('projectName') + '/version/' + v('versionName') + '/' + v('date') + '&locale=' + v('locale') + '?word=' + v('wordCheck');
+            var url = v('url') + 'rest/stats/project/' + v('projectName') + '/version/' + v('versionName') + '/' + v('date');
         }
         $.ajax({
             url: url,
+            crossDomain: true,
             headers: {
-                Accept: 'application/json; charset=utf-8',
+                'Accept': 'application/json',
                 'X-Auth-User': v('username'),
                 'X-Auth-Token': v('userToken'),
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
             },
+            xhrFields: {
+                withCredentials: true
+            },
+            data: {
+                locale: v('locale'),
+                detail: true,
+                word: v('word')
+            },
+            dataType: 'json',
+            contentType: 'application/json',
             success: function(data, status, _) {
-                console.log('Data Received:' + data);
+                console.log('Data Received:' + JSON.stringify(data));
             },
             error: function(data, status, _) {
-                console.log('Unexpected Error, code:' + status + ', data:' + data);
+                console.log('Unexpected Error, code:' + data.status + ', message:' + data.responseText);
             }
         })
     }
@@ -130,7 +153,7 @@ function v(name) {
     switch(name) {
         case 'url':
             var url = $('#zanataURL').val();
-            if(url == '') url = 'https://translate.zanata.org/';
+            if(url == '') url = 'http://translate.zanata.org/';
             if(!url.endsWith('/')) url.concat('/');
             return url;
         case 'date':
