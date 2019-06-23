@@ -87,9 +87,7 @@
                             <div class="form-group row">
                                 <div class="col-sm-3"><label for="locale">언어</label></div>
                                 <div class="col-sm">
-                                    <select name="locale" lass="form-control" id="locale" aria-describedby="localeHelp">
-                                        <option value="">버전을 먼저 입력하세요</option>
-                                    </select>
+                                    <input type="text" class="form-control" id="locale" aria-describedby="localeHelp" placeholder="ko">
                                     <small id="localeHelp" class="form-text text-muted">언어는 자나타의 언어 명을 따릅니다. 입력하지 않으면 한국어(ko)를 기본값으로 합니다.</small>
                                 </div>
                             </div>
@@ -136,8 +134,8 @@
                                 </div>
                             </div>
                             <div class="form-group form-check">
-                                <input type="checkbox" class="form-check-input" id="wordCheck">
-                                <label class="form-check-label" for="wordCheck">Word 기반 통계 조회</label>
+                                <input type="checkbox" class="form-check-input" id="word">
+                                <label class="form-check-label" for="word">Word 기반 통계 조회</label>
                             </div>
                             <button id="submit" class="btn btn-success">불러오기</button>
                         </div>
@@ -151,7 +149,7 @@
                                     <h3>기여 그래프</h3>
                                 </div>
                                 <div class="col-sm">
-                                    <div class="dropdown graph-type float-right">
+                                    <div id="graphtypediv" class="d-none dropdown float-right">
                                         <button class="btn btn-success dropdown-toggle" type="button" id="graphtypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             그래프 정보 선택
                                         </button>
@@ -167,7 +165,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <canvas id="chart" class="card-img-top" aria-label="Contribution Graph" role="img">
+                            <canvas id="chart" class="card-img-top d-none" aria-label="Contribution Graph" role="img">
                             </canvas>
                             <p class="please-query text-center m-5">불러오고 싶은 정보를 선택해 주세요.</p>
                             <div class="loading d-none justify-content-center">
@@ -187,8 +185,7 @@
                                     <span class="sr-only">불러오는 중...</span>
                                 </div>
                             </div>
-                            <div class="contribution-info"></div>
-                            </table>
+                            <div class="table-responsive"><table class="d-none table table-borderless table-hover" id="contribution-info"></table></div>
                         </div>
                     </div>
                 </div>

@@ -2,18 +2,6 @@
     background-color: #4caf50;
 }
 
-.graph-type {
-    display: auto;
-}
-
-.contribution-table {
-    display: none;
-}
-
-#chart {
-    display: none;
-}
-
 .nav-image {
     opacity: 0.5;
     filter: alpha(opacity=50); /* For IE8 and earlier */

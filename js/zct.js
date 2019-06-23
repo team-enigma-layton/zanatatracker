@@ -1,3 +1,7 @@
+/* 
+DOCUMENT ELEMENTS BEHAVIOR
+*/
+
 $(document).ready(function() {  // or $(function()
     init();
 });
@@ -10,12 +14,19 @@ function init() {
     });
 }
 
-$('#submit').click(function () {
+$('#submit').click(function() {
+    if(!checkValues()) return false;
     var tu = v('targetUsername');
     var date = v('date');
     $('.loading').removeClass("d-none");
     $('.loading').addClass("d-flex");
     $('.please-query').addClass("d-none");
+    $('#contribution-info').removeClass("d-table");
+    $('#contribution-info').addClass("d-none");
+    $('#chart').addClass("d-none");
+    $('#chart').removeClass("d-block");
+    $('#graphtypediv').addClass("d-none");
+    $('#graphtypediv').removeClass("d-flex");
     if(tu.length > 1) {
         var dataArray = new Array();
         var userSize = tu.length;
@@ -85,7 +96,7 @@ $('#submit').click(function () {
             data: {
                 locale: v('locale'),
                 detail: true,
-                word: v('word')
+                word: v('word').toString()
             },
             dataType: 'json',
             contentType: 'application/json',
@@ -115,8 +126,8 @@ $('#submit').click(function () {
             }
         })
     }
-    
-  
+
+    //Save Cookies
     $.each(elements, function (_, r) {
         setCookie(r, v(r), 7);
     });
@@ -130,16 +141,238 @@ $('#close-500').on('click', function() {
     $('#500').fadeOut(200);
 })
 
+/*
+    FUNCTIONS
+*/
+
+// Data cache for rebuilding graph view.
+var data_cache = undefined;
+var data_cache_type = undefined;
+var chart_instance = null;
+
+
+// Graph Type Enum
+var GraphType = {
+    PERCENTAGE: 0,
+    NUMBERS: 1
+}
+
+var UnitType = {
+    MESSAGE: 0,
+    WORD: 1,
+    properties : [ "MESSAGE", "WORD" ]
+}
+
+var UserStatType = {
+    TRANSLATION: 0,
+    REVIEW: 1
+}
+
+var DataType = {
+    VERSION_GLOBAL: 0,
+    VERSION_BY_DATE: 1,
+    USERS: 2
+}
+
+var DateRangeType = {
+    GLOBAL: 0,
+    BY_DAY: 1,
+    BY_WEEK: 2,
+    BY_MONTH: 3
+}
+
+function updateGraph(graphType, unitType, dateRangeType) {
+    if(chart_instance != null) chart_instance.destroy();
+    var ctx = $('#chart');
+    if(data_cache_type == DataType.VERSION_GLOBAL) {
+        if(unitType == UnitType.MESSAGE) {
+            var unitTypeString = "메시지";
+        } else {
+            var unitTypeString = "단어";
+        }
+        if(graphType == GraphType.PERCENTAGE) {
+            var graphTypeString = "퍼센트";
+        } else {
+            var graphTypeString = "갯수";
+        }
+        new Chart(ctx, {
+            type: 'horizontalBar',
+            data: makeDataset(data_cache, data_cache_type, graphType, unitType, dateRangeType),
+            options: {
+                legend: { labels: { fontColor: 'white' } },
+                title: { display: true, text: unitTypeString + " 기준 통계(" + graphTypeString + ")", fontColor: 'white' },
+                tooltips: { mode: 'index', intersect: false },
+                responsive: true,
+                scales: { 
+                    xAxes: [{
+                        stacked: true, 
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'white',
+                            showLabelBackdrop: false
+                        },
+                        gridLines: {
+                            color: 'rgba(255, 255, 255, 0.2)'
+                        },
+                        pointLabels: {
+                            fontColor: 'white'
+                        },
+                        angleLines: {
+                            color: 'white'
+                        }
+                    }],
+                    yAxes: [{
+                        stacked: true, 
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'white',
+                            showLabelBackdrop: false
+                        },
+                        gridLines: {
+                            color: 'rgba(255, 255, 255, 0.2)'
+                        },
+                        pointLabels: {
+                            fontColor: 'white'
+                        },
+                        angleLines: {
+                            color: 'white'
+                        }
+                    }],
+                }
+            }
+        });
+    }
+}
+
+function makeDataset(data, dataType, graphType, unitType, dateRangeType) {
+    if(dataType == DataType.VERSION_GLOBAL) {
+        var labels = new Array();
+        var needReview = new Array();
+        var rejected = new Array();
+        var approved = new Array();
+        var translated = new Array();
+        var untranslated = new Array();
+        $.each(data.stats, function(_, stat) {
+            if(stat.unit != UnitType.properties[unitType]) return true;
+            console.log()
+            labels.push(data.id);
+            if(graphType == GraphType.PERCENTAGE) {
+                needReview.push(Math.round((stat.needReview / stat.total) * 10000) / 100);
+                rejected.push(Math.round((stat.rejected / stat.total) * 10000) / 100);
+                approved.push(Math.round((stat.approved / stat.total) * 10000) / 100);
+                translated.push(Math.round((stat.translated / stat.total) * 10000) / 100);
+                untranslated.push(Math.round((stat.untranslated / stat.total) * 10000) / 100);
+            } else {
+                needReview.push(stat.needReview);
+                rejected.push(stat.rejected);
+                approved.push(stat.approved);
+                translated.push(stat.translated);
+                untranslated.push(stat.untranslated);
+            }
+        });
+        $.each(data.detailedStats, function(_, dData) {
+            $.each(dData.stats, function(_, dstat) {
+                if(dstat.unit != UnitType.properties[unitType]) return true;
+                labels.push(dData.id);
+                if(graphType == GraphType.PERCENTAGE) {
+                    needReview.push(Math.round((dstat.needReview / dstat.total) * 10000) / 100);
+                    rejected.push(Math.round((dstat.rejected / dstat.total) * 10000) / 100);
+                    approved.push(Math.round((dstat.approved / dstat.total) * 10000) / 100);
+                    translated.push(Math.round((dstat.translated / dstat.total) * 10000) / 100);
+                    untranslated.push(Math.round((dstat.untranslated / dstat.total) * 10000) / 100);
+                } else {
+                    needReview.push(dstat.needReview);
+                    rejected.push(dstat.rejected);
+                    approved.push(dstat.approved);
+                    translated.push(dstat.translated);
+                    untranslated.push(dstat.untranslated);
+                }
+            });
+        });
+        var dataset = {
+            'labels': labels,
+            'datasets': [
+                { 'label': '번역됨', 'data': translated, 'backgroundColor': '#5CCA7B' },
+                { 'label': '확인 필요', 'data': needReview, 'backgroundColor': '#E9DF1B' },
+                { 'label': '검증됨', 'data': approved, 'backgroundColor': '#03A6D7' },
+                { 'label': '거부', 'data': rejected, 'backgroundColor': '#FFA800' },
+                { 'label': '미번역', 'data': untranslated, 'backgroundColor': '#EEEEEE' }
+            ]
+        };
+        console.log(dataset);
+        return dataset;
+    }
+}
+
+
 function updateUserStatics(data) {
 
 }
 
 function updateVersionStatics(data) {
-
+    var stats = data.stats
+    console.log(JSON.stringify(stats));
+    var table = '<thead><tr>' +
+    '<th scope="col">이름</th>' +
+    '<th scope="col">측정 기준</th><th scope="col">전체</th>' +
+    '<th scope="col">미번역</th><th scope="col">확인 필요</th><th scope="col">거부</th>' + 
+    '<th scope="col">검증됨</th><th scope="col">번역됨</th><th scope="col">마지막 번역</th></tr></thead><tbody>';
+    var namePresent = false;
+    var labels = new Array();
+    var needReview = new Array();
+    var rejected = new Array();
+    var approved = new Array();
+    var translated = new Array();
+    $.each(stats, function(_, stat) {
+        if(!namePresent) {
+            table = table + renderStat(data.id, stat, false);
+            namePresent = true;
+        } else {
+            table = table + renderStat('', stat, false);
+        }
+        
+    })
+    var detailed = data.detailedStats
+    $.each(detailed, function(_, stat) {
+        var dNamePresent = false;
+        $.each(stat.stats, function(_, dStat) {
+            if(!dNamePresent) {
+                table = table + renderStat(stat.id, dStat, true);
+                dNamePresent = true;
+            } else {
+                table = table +renderStat('', dStat, false);
+            }
+            
+        })
+    })
+    table = table + "</tbody>"
+    //console.log(table);
+    data_cache = data;
+    data_cache_type = DataType.VERSION_GLOBAL;
+    updateGraph(GraphType.PERCENTAGE, UnitType.MESSAGE, DateRangeType.GLOBAL);
+    $('#contribution-info').html(table);
+    $('#contribution-info').removeClass("d-none");
+    $('#contribution-info').addClass("d-table");
+    $('#chart').removeClass("d-none");
+    $('#chart').addClass("d-block");
+    //$('#graphtypediv').removeClass("d-none");
+    //$('#graphtypediv').addClass("d-flex");
 }
 
 function updateVersionDateStatics(data) {
 
+}
+
+function renderStat(name, stat, borderTop) {
+    var s = '';
+    if(borderTop) {
+        s = '<tr class="border-top">';
+    } else {
+        s = '<tr>';
+    }
+    return s +
+    '<th scope="row">'+ name + '</th>' +
+    '<td>'+ stat.unit + '</td><td>'+ stat.total + '</td><td>'+ stat.untranslated + '</td><td>' + stat.needReview + '</td><td>' + stat.rejected + '</td><td>'+ stat.approved + '</td><td>'+ stat.translated + '</td><td>' + stat.lastTranslated + '</td></tr>';
 }
 
 function checkValues() {
@@ -222,27 +455,12 @@ function v(name) {
             return locale;
         case 'targetUsername':
             return $('#targetUsername').val().split(',');
-        case 'wordCheck':
-            return $('#wordCheck').prop('checked');
+        case 'word':
+            return $('#word').prop('checked');
         default:
             return $('#' + name).val();
     }
 }
-
-$('#versionName').change(function () {
-    console.log('versionName changed');
-
-    fetch(v('url') + 'project/' + v('projectName') + '/version/' + v('versionName') + '/locales', {mode: 'cors'})
-    .then(function(response) {
-        // Convert to JSON
-        return response.json();
-    }).then(function(j) {
-        // Yay, `j` is a JavaScript object
-        console.log(JSON.stringify(j));
-    }).catch(function(error) {
-        console.log('Request failed', error)
-    });
-});
 
 function setCookie(cookie_name, value, days) {
     var exdate = new Date();
