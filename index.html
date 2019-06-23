@@ -28,6 +28,19 @@
             </ul>
         </nav>
         <div class="container-fluid">
+            <!-- Alerts -->
+            <div id="404" style="display: none;" class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>404 에러!</strong> 요청한 프로젝트, 버전 혹은 사용자를 찾을 수 없습니다.
+                <button id="close-404" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="500" style="display: none;" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>500 에러!</strong> Zanata 서버에 치명적인 오류가 발생하였습니다! 이 경우 대부분 서버 호스트의 문제입니다.
+                <button id="close-500" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
             <div class="card mt-1">
                 <div class="card-body">
                     <div class="row">
@@ -155,6 +168,11 @@
                             <canvas id="chart" class="card-img-top" aria-label="Contribution Graph" role="img">
                             </canvas>
                             <p class="please-query text-center m-5">불러오고 싶은 정보를 선택해 주세요.</p>
+                            <div class="loading d-none justify-content-center">
+                                <div class="spinner-border text-success" role="status">
+                                    <span class="sr-only">불러오는 중...</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="card mt-1">
@@ -162,9 +180,36 @@
                             <h3 class="card-title">상세 기여 정보</h3>
                             <hr>
                             <p class="please-query text-center m-5">불러오고 싶은 정보를 선택해 주세요.</p>
-                            <table class="contribution-table">
+                            <div class="loading d-none justify-content-center">
+                                <div class="spinner-border text-success" role="status">
+                                    <span class="sr-only">불러오는 중...</span>
+                                </div>
+                            </div>
+                            <div class="contribution-info"></div>
                             </table>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="CORSExtModal" tabindex="-1" role="dialog" aria-labelledby="CORSExtModalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="CORSExtModalTitle">CORS 요청이 차단됨</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>브라우저에선 기본적으로 CORS(다른 도매인에 웹 요청을 하는 것)을 차단합니다. 이는 Zanata REST API 에 ZCT 가 접근하는 것을 막습니다.</p>
+                        <p>차단을 해제하기 위해 확장기능을 설치하면 ZCT를 계속 이용하실 수 있습니다.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-primary" role="button" href="https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi" target="_blank" rel="noopener" aria-label="Chrome"><i class="fab fa-chrome mr-1"></i>Chrome</a>
+                        <a class="btn btn-danger" role="button" href="https://addons.mozilla.org/ko/firefox/addon/cors-everywhere/" target="_blank" rel="noopener" aria-label="Firefox"><i class="fab fa-firefox mr-1"></i>Firefox</a>
                     </div>
                 </div>
             </div>

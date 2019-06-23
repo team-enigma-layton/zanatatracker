@@ -2,18 +2,21 @@ $('#submit').click(function() {
     if(!checkValues()) return false;
     var tu = v('targetUsername');
     var date = v('date');
+    $('.loading').removeClass("d-none");
+    $('.loading').addClass("d-flex");
+    $('.please-query').addClass("d-none");
     if(tu.length > 1) {
+        var dataArray = new Array();
+        var userSize = tu.length;
         $.each(tu, function(_, u) {
             var url = v('url') + 'rest/stats/project/' + v('projectName') + '/version/' + v('versionName') + '/contributor/' + u + '/' + v('date');
             $.ajax({
                 url: url,
-                crossDomain: true,
                 headers: {
                     'Accept': 'application/json',
                     'X-Auth-User': v('username'),
                     'X-Auth-Token': v('userToken'),
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
+                    'Content-Type': 'application/json'
                 },
                 xhrFields: {
                     withCredentials: true
@@ -25,10 +28,29 @@ $('#submit').click(function() {
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function(data, status, _) {
-                    console.log('Data Received:' + data.responseText);
+                    dataArray.push(data);
                 },
                 error: function(data, status, _) {
                     console.log('Unexpected Error, code:' + data.status + ', message:' + data.responseText);
+                    switch(data.status) {
+                        case 0:
+                            $('#CORSExtModal').modal('show');
+                            break;
+                        case 404:
+                            $('#404').show();
+                            break;
+                        case 500:
+                            $('#500').show();
+                            break;
+                    }
+                    userSize--;
+                },
+                complete: function() {
+                    if(dataArray.length == userSize && userSize > 0) {
+                        $('.loading').removeClass("d-flex");
+                        $('.loading').addClass("d-none");
+                        updateUserStatics(dataArray);
+                    }
                 }
             })
         });
@@ -40,13 +62,11 @@ $('#submit').click(function() {
         }
         $.ajax({
             url: url,
-            crossDomain: true,
             headers: {
                 'Accept': 'application/json',
                 'X-Auth-User': v('username'),
                 'X-Auth-Token': v('userToken'),
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+                'Content-Type': 'application/json'
             },
             xhrFields: {
                 withCredentials: true
@@ -59,15 +79,53 @@ $('#submit').click(function() {
             dataType: 'json',
             contentType: 'application/json',
             success: function(data, status, _) {
-                console.log('Data Received:' + JSON.stringify(data));
+                $('.loading').removeClass("d-flex");
+                $('.loading').addClass("d-none");
+                if(date =='--..--') {
+                    updateVersionStatics(data);
+                } else {
+                    updateVersionDateStatics(data);
+                }
+                
             },
             error: function(data, status, _) {
                 console.log('Unexpected Error, code:' + data.status + ', message:' + data.responseText);
+                switch(data.status) {
+                    case 0:
+                        $('#CORSExtModal').modal('show');
+                        break;
+                    case 404:
+                        $('#404').fadeIn(200);
+                        break;
+                    case 500:
+                        $('#500').fadeIn(200);
+                        break;
+                }
             }
         })
     }
     
 })
+
+$('#close-404').on('click', function() {
+    $('#404').fadeOut(200);
+})
+
+$('#close-500').on('click', function() {
+    $('#500').fadeOut(200);
+})
+
+function updateUserStatics(data) {
+
+}
+
+function updateVersionStatics(data) {
+
+}
+
+function updateVersionDateStatics(data) {
+
+}
 
 function checkValues() {
     var check = true;
