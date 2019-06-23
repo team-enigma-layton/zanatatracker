@@ -171,6 +171,21 @@ function v(name) {
     }
 }
 
+$('#versionName').change(function () {
+    console.log('versionName changed');
+
+    fetch(v('url') + 'project/' + v('projectName') + '/version/' + v('versionName') + '/locales', {mode: 'cors'})
+    .then(function(response) {
+        // Convert to JSON
+        return response.json();
+    }).then(function(j) {
+        // Yay, `j` is a JavaScript object
+        console.log(JSON.stringify(j));
+    }).catch(function(error) {
+        console.log('Request failed', error)
+    });
+});
+
 function setCookie(cookie_name, value, days) {
     var exdate = new Date();
     exdate.setDate(exdate.getDate() + days);
