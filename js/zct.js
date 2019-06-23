@@ -1,5 +1,17 @@
-$('#submit').click(function() {
-    if(!checkValues()) return false;
+$(document).ready(function() {  // or $(function()
+    init();
+});
+
+var elements = ['zanataURL', 'username', 'userToken', 'projectName', 'versionName', 'locale', 'targetUserName']
+
+function init() {
+    $.each(elements, function (_, r) {
+        $("#" + r).val(getCookie(r));
+        setCookie(r, v(r), 7);
+    });
+}
+
+$('#submit').click(function () {
     var tu = v('targetUsername');
     var date = v('date');
     if(tu.length > 1) {
@@ -44,6 +56,10 @@ $('#submit').click(function() {
         })
     }
     
+  
+    $.each(elements, function (_, r) {
+        setCookie(r, v(r), 7);
+    });
 })
 
 function checkValues() {
@@ -129,6 +145,29 @@ function v(name) {
         case 'wordCheck':
             return $('#wordCheck').prop('checked');
         default:
-            return $('#' + name);
+            return $('#' + name).val();
+    }
+}
+
+function setCookie(cookie_name, value, days) {
+    var exdate = new Date();
+    exdate.setDate(exdate.getDate() + days);
+  
+    var cookie_value = escape(value) + ((days == null) ? '' : ';    expires=' + exdate.toUTCString());
+    document.cookie = cookie_name + '=' + cookie_value;
+}
+
+function getCookie(cookie_name) {
+    var x, y;
+    var val = document.cookie.split(';');
+
+    for (var i = 0; i < val.length; i++) {
+        x = val[i].substr(0, val[i].indexOf('='));
+        y = val[i].substr(val[i].indexOf('=') + 1);
+      
+        x = x.replace(/^\s+|\s+$/g, '');
+        if (x == cookie_name) {
+            return unescape(y);
+        }
     }
 }
