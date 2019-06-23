@@ -443,7 +443,7 @@ function v(name) {
     switch(name) {
         case 'url':
             var url = $('#zanataURL').val();
-            if(url == '') url = 'http://translate.zanata.org/';
+            if(url == '') url = 'https://translate.zanata.org/';
             if(!url.endsWith('/')) url.concat('/');
             return url;
         case 'date':
