@@ -35,6 +35,12 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+            <div id="401" style="display: none;" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>401 에러!</strong> 인증에 실패하였습니다! 사용자 ID 혹은 토큰이 잘못된 것일 수 있습니다.
+                    <button id="close-401" type="button" class="close" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
             <div id="500" style="display: none;" class="alert alert-danger alert-dismissible fade show" role="alert">
                 <strong>500 에러!</strong> Zanata 서버에 치명적인 오류가 발생하였습니다! 이 경우 대부분 서버 호스트의 문제입니다.
                 <button id="close-500" type="button" class="close" aria-label="Close">
@@ -207,7 +213,12 @@
                         <p>차단을 해제하기 위해 확장기능을 설치하면 ZCT를 계속 이용하실 수 있습니다.</p>
                     </div>
                     <div class="modal-footer">
-                        <a class="btn btn-primary" role="button" href="https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi" target="_blank" rel="noopener" aria-label="Chrome"><i class="fab fa-chrome mr-1"></i>Chrome</a>
+                        <span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="현재 크롬에서 확장기능을 통한 CORS 차단 해제가 불가능합니다. 파이어폭스를 이용해주세요.">
+                            <!--
+                                <a class="btn btn-primary" role="button" href="https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi" target="_blank" rel="noopener" aria-label="Chrome" disabled><i class="fab fa-chrome mr-1"></i>Chrome</a>
+                            -->
+                            <button class="btn btn-primary" style="pointer-events: none;" type="button" disabled><i class="fab fa-chrome mr-1"></i>Chrome</button>
+                        </span>
                         <a class="btn btn-danger" role="button" href="https://addons.mozilla.org/ko/firefox/addon/cors-everywhere/" target="_blank" rel="noopener" aria-label="Firefox"><i class="fab fa-firefox mr-1"></i>Firefox</a>
                     </div>
                 </div>

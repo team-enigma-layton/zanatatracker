@@ -2,6 +2,11 @@
 DOCUMENT ELEMENTS BEHAVIOR
 */
 
+// ENABLE TOOLTIPS
+$(function() {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+
 $(document).ready(function() {  // or $(function()
     init();
 });
@@ -59,11 +64,14 @@ $('#submit').click(function() {
                         case 0:
                             $('#CORSExtModal').modal('show');
                             break;
+                        case 401:
+                            $('#401').fadeIn(200);
+                            break;
                         case 404:
-                            $('#404').show();
+                            $('#404').fadeIn(200);
                             break;
                         case 500:
-                            $('#500').show();
+                            $('#500').fadeIn(200);
                             break;
                     }
                     userSize--;
@@ -92,9 +100,6 @@ $('#submit').click(function() {
                 'Content-Type': 'application/json',
                 'Access-Control-Request-Headers': 'x-requested-with'
             },
-            xhrFields: {
-                withCredentials: true
-            },
             data: {
                 locale: v('locale'),
                 detail: true,
@@ -118,6 +123,9 @@ $('#submit').click(function() {
                     case 0:
                         $('#CORSExtModal').modal('show');
                         break;
+                    case 401:
+                        $('#401').fadeIn(200);
+                        break;
                     case 404:
                         $('#404').fadeIn(200);
                         break;
@@ -137,6 +145,10 @@ $('#submit').click(function() {
 
 $('#close-404').on('click', function() {
     $('#404').fadeOut(200);
+})
+
+$('#close-401').on('click', function() {
+    $('#401').fadeOut(200);
 })
 
 $('#close-500').on('click', function() {
