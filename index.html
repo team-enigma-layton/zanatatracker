@@ -47,7 +47,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="card mt-1">
+            <div id="userinfo" class="card mt-1">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-2">
@@ -77,7 +77,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-3">
+                <div id="action" class="col-lg-3">
                     <div class="card mt-1">
                         <div class="card-body">
                             <h3 class="card-title">액션</h3>
@@ -147,7 +147,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-9">
+                <div class="col-lg">
                     <div class="card text-white bg-secondary border-secondary mt-1">
                         <div class="card-header">
                             <div class="row">
@@ -155,17 +155,36 @@
                                     <h3>기여 그래프</h3>
                                 </div>
                                 <div class="col-sm">
-                                    <div id="graphtypediv" class="d-none dropdown float-right">
-                                        <button class="btn btn-success dropdown-toggle" type="button" id="graphtypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            그래프 정보 선택
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="graphtypeDropdown">
-                                            <a class="dropdown-item" href="#">일별 비교</a>
-                                            <a class="dropdown-item" href="#">주별 비교</a>
-                                            <!--
-                                            <a class="dropdown-item" href="#">사용자별 비교</a> // Enabled Only when query multiple users.
-                                            -->
+                                    <div class="float-right">
+                                        <div id="counttype" class="d-none btn-group btn-group-toggle" data-toggle="buttons">
+                                            <label class="btn btn-secondary active">
+                                                <input type="radio" name="counttype" id="message" autocomplete="off" checked> 메시지
+                                            </label>
+                                            <label class="btn btn-secondary">
+                                                <input type="radio" name="counttype" id="word" autocomplete="off"> 워드
+                                            </label>
                                         </div>
+                                        <div id="graphtype" class="d-none btn-group btn-group-toggle" data-toggle="buttons">
+                                            <label class="btn btn-secondary active">
+                                                <input type="radio" name="graphtype" id="percentage" autocomplete="off" checked> 퍼센트
+                                            </label>
+                                            <label class="btn btn-secondary">
+                                                <input type="radio" name="graphtype" id="number" autocomplete="off"> 갯수
+                                            </label>
+                                        </div>
+                                        <div id="daterange" class="d-none btn-group btn-group-toggle" data-toggle="buttons">
+                                            <label class="btn btn-secondary active">
+                                                <input type="radio" name="daterange" id="day" autocomplete="off" checked> 1일
+                                            </label>
+                                            <label class="btn btn-secondary">
+                                                <input type="radio" name="daterange" id="week" autocomplete="off"> 7일
+                                            </label>
+                                            <label class="btn btn-secondary">
+                                                <input type="radio" name="daterange" id="month" autocomplete="off"> 30일
+                                            </label>
+                                        </div>
+                                        
+                                        <label id="expand" type="button" class="btn btn-block bg-transparent text-white"><i class="fas fa-expand nav-image"></i></label>
                                     </div>
                                 </div>
                             </div>

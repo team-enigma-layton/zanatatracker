@@ -155,6 +155,20 @@ $('#close-500').on('click', function() {
     $('#500').fadeOut(200);
 })
 
+$('#expand').on('click', function() {
+    if($('#expand i').hasClass("fa-expand")) {
+        $('#expand i').removeClass("fa-expand");
+        $('#expand i').addClass("fa-compress");
+        $('#userinfo').addClass("d-none");
+        $('#action').addClass("d-none");
+    } else {
+        $('#expand i').addClass("fa-expand");
+        $('#expand i').removeClass("fa-compress");
+        $('#userinfo').removeClass("d-none");
+        $('#action').removeClass("d-none");
+    }
+})
+
 /*
     FUNCTIONS
 */
