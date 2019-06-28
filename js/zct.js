@@ -5,7 +5,7 @@ DOCUMENT ELEMENTS BEHAVIOR
 // ENABLE TOOLTIPS
 $(function() {
     $('[data-toggle="tooltip"]').tooltip()
-  })
+});
 
 $(document).ready(function() {  // or $(function()
     init();
@@ -23,6 +23,7 @@ $('#submit').click(function() {
     if(!checkValues()) return false;
     var tu = v('targetUsername');
     var date = v('date');
+    // Reset Views
     $('.loading').removeClass("d-none");
     $('.loading').addClass("d-flex");
     $('.please-query').addClass("d-none");
@@ -30,9 +31,10 @@ $('#submit').click(function() {
     $('#contribution-info').addClass("d-none");
     $('#chart').addClass("d-none");
     $('#chart').removeClass("d-block");
-    $('#graphtypediv').addClass("d-none");
-    $('#graphtypediv').removeClass("d-flex");
-    if(tu.length > 1) {
+    $('#unittype').addClass("d-none");
+    $('#graphtype').addClass("d-none");
+    $('#daterange').addClass("d-none");
+    if(tu.length > 1 || tu[0].length > 0) {
         var dataArray = new Array();
         var userSize = tu.length;
         $.each(tu, function(_, u) {
@@ -83,7 +85,7 @@ $('#submit').click(function() {
                         updateUserStatics(dataArray);
                     }
                 }
-            })
+            });
         });
     } else {
         if(date == '--..--') {
@@ -91,6 +93,7 @@ $('#submit').click(function() {
         } else {
             var url = v('url') + 'rest/stats/project/' + v('projectName') + '/version/' + v('versionName') + '/' + v('date');
         }
+        var word = v('word');
         $.ajax({
             url: url,
             headers: {
@@ -103,7 +106,7 @@ $('#submit').click(function() {
             data: {
                 locale: v('locale'),
                 detail: true,
-                word: v('word').toString()
+                word: word.toString()
             },
             dataType: 'json',
             contentType: 'application/json',
@@ -111,7 +114,7 @@ $('#submit').click(function() {
                 $('.loading').removeClass("d-flex");
                 $('.loading').addClass("d-none");
                 if(date =='--..--') {
-                    updateVersionStatics(data);
+                    updateVersionStatics(data, word);
                 } else {
                     updateVersionDateStatics(data);
                 }
@@ -134,26 +137,26 @@ $('#submit').click(function() {
                         break;
                 }
             }
-        })
+        });
     }
 
     //Save Cookies
     $.each(elements, function (_, r) {
         setCookie(r, v(r), 7);
     });
-})
+});
 
 $('#close-404').on('click', function() {
     $('#404').fadeOut(200);
-})
+});
 
 $('#close-401').on('click', function() {
     $('#401').fadeOut(200);
-})
+});
 
 $('#close-500').on('click', function() {
     $('#500').fadeOut(200);
-})
+});
 
 $('#expand').on('click', function() {
     if($('#expand i').hasClass("fa-expand")) {
@@ -161,13 +164,22 @@ $('#expand').on('click', function() {
         $('#expand i').addClass("fa-compress");
         $('#userinfo').addClass("d-none");
         $('#action').addClass("d-none");
+        $('#result').removeClass("col-lg-9");
+        $('#result').addClass("col-lg");
     } else {
         $('#expand i').addClass("fa-expand");
         $('#expand i').removeClass("fa-compress");
         $('#userinfo').removeClass("d-none");
         $('#action').removeClass("d-none");
+        $('#result').removeClass("col-lg");
+        $('#result').addClass("col-lg-9");
     }
-})
+});
+
+$('.graph-options').change( function() {
+    var options = getGraphOptions();
+    updateGraph(options.g, options.u, options.d);
+});
 
 /*
     FUNCTIONS
@@ -209,6 +221,27 @@ var DateRangeType = {
     BY_MONTH: 3
 }
 
+function getGraphOptions() {
+    var array = {
+        g: GraphType.PERCENTAGE,
+        u: UnitType.MESSAGE,
+        d: DateRangeType.GLOBAL
+    }
+    if(!$('#graphtype').hasClass("d-none") && $('.graph-options#number').prop('checked')) array.g = GraphType.NUMBERS;
+    if(!$('#unittype').hasClass("d-none") && $('.graph-options#word').prop('checked')) array.u = UnitType.WORD;
+    if(!$('#daterange').hasClass("d-none")) {
+        if($('.graph-options#day').prop('checked')) {
+            array.d = DateRangeType.BY_DAY;
+        } else if($('.graph-options#week').prop('checked')) {
+            array.d = DateRangeType.BY_WEEK;
+        } else if($('.graph-options#month').prop('checked')) {
+            array.d = DateRangeType.BY_MONTH;
+        }
+    }
+    console.log(array);
+    return array;
+}
+
 function updateGraph(graphType, unitType, dateRangeType) {
     if(chart_instance != null) chart_instance.destroy();
     var ctx = $('#chart');
@@ -223,7 +256,7 @@ function updateGraph(graphType, unitType, dateRangeType) {
         } else {
             var graphTypeString = "갯수";
         }
-        new Chart(ctx, {
+        chart_instance = new Chart(ctx, {
             type: 'horizontalBar',
             data: makeDataset(data_cache, data_cache_type, graphType, unitType, dateRangeType),
             options: {
@@ -327,30 +360,57 @@ function makeDataset(data, dataType, graphType, unitType, dateRangeType) {
                 { 'label': '미번역', 'data': untranslated, 'backgroundColor': '#EEEEEE' }
             ]
         };
-        console.log(dataset);
         return dataset;
+    } else if(dataType == DataType.VERSION_BY_DATE) {
+        //TO-DO: Make Graph for Version by Date Type.
     }
 }
 
 
 function updateUserStatics(data) {
-
+    var table = '<thead><tr>' +
+    '<th scope="col">유저 이름</th>' +
+    '<th scope="col">기여 형식</th><th scope="col">검증됨</th>' +
+    '<th scope="col">거부됨</th><th scope="col">번역됨</th><th scope="col">확인 필요</th></tr></thead><tbody>';
+    $.each(data, function(_, user) {
+        var ts = {
+            approved: 0,
+            rejected: 0,
+            translated: 0,
+            needReview: 0
+        };
+        var rs = {
+            approved: 0,
+            rejected: 0,
+            translated: 0,
+            needReview: 0
+        }
+        if(user.contributions.length > 0) {
+            if(user.contributions[0].hasOwnProperty("translation-stats")) ts = user.contributions[0]['translation-stats'];
+            if(user.contributions[0].hasOwnProperty("review-stats")) ts = user.contributions[0]['review-stats'];
+        }
+        table = table + renderUserStat(user.username, ts, rs);
+    });
+    table = table + "</tbody>";
+    data_cache = data;
+    data_cache_type = DataType.USERS;
+    var options = getGraphOptions();
+    updateGraph(options.g, options.u, options.d);
+    $('#contribution-info').html(table);
+    $('#contribution-info').removeClass("d-none");
+    $('#contribution-info').addClass("d-table");
+    $('#chart').removeClass("d-none");
+    $('#chart').addClass("d-block");
 }
 
-function updateVersionStatics(data) {
-    var stats = data.stats
-    console.log(JSON.stringify(stats));
+function updateVersionStatics(data, word) {
+    var stats = data.stats;
     var table = '<thead><tr>' +
     '<th scope="col">이름</th>' +
     '<th scope="col">측정 기준</th><th scope="col">전체</th>' +
-    '<th scope="col">미번역</th><th scope="col">확인 필요</th><th scope="col">거부</th>' + 
-    '<th scope="col">검증됨</th><th scope="col">번역됨</th><th scope="col">마지막 번역</th></tr></thead><tbody>';
+    '<th scope="col">미번역</th><th scope="col">확인 필요</th><th scope="col">번역됨</th>' + 
+    '<th scope="col">검증됨</th><th scope="col">거부됨</th><th scope="col">마지막 번역</th></tr></thead><tbody>';
     var namePresent = false;
-    var labels = new Array();
-    var needReview = new Array();
-    var rejected = new Array();
-    var approved = new Array();
-    var translated = new Array();
     $.each(stats, function(_, stat) {
         if(!namePresent) {
             table = table + renderStat(data.id, stat, false);
@@ -373,22 +433,64 @@ function updateVersionStatics(data) {
             
         })
     })
-    table = table + "</tbody>"
-    //console.log(table);
+    table = table + "</tbody>";
     data_cache = data;
     data_cache_type = DataType.VERSION_GLOBAL;
-    updateGraph(GraphType.PERCENTAGE, UnitType.MESSAGE, DateRangeType.GLOBAL);
+    var options = getGraphOptions();
+    updateGraph(options.g, options.u, options.d);
     $('#contribution-info').html(table);
     $('#contribution-info').removeClass("d-none");
     $('#contribution-info').addClass("d-table");
     $('#chart').removeClass("d-none");
     $('#chart').addClass("d-block");
-    //$('#graphtypediv').removeClass("d-none");
-    //$('#graphtypediv').addClass("d-flex");
+    $('#graphtype').removeClass("d-none");
+    if(word) $('#unittype').removeClass("d-none");
 }
 
 function updateVersionDateStatics(data) {
+    var table = '<thead><tr>' +
+    '<th scope="col">날짜</th>' +
+    '<th scope="col">신규</th><th scope="col">확인 필요</th><th scope="col">번역됨</th>' + 
+    '<th scope="col">검증됨</th><th scope="col">거부됨</th></thead><tbody>';
+    var cdata = new Map();
+    $.each(data, function(_, stat) {
+        if(!cdata.has(stat.savedDate)) cdata.set(stat.savedDate, new Map());
+        var map = cdata.get(stat.savedDate);
+        map.set(stat.savedState, stat.wordCount);
+        cdata.set(stat.savedDate, map);
+    });
+    cdata.forEach(function(stat, date, _) {
+        table = table + renderDateStat(date, stat);
+    });
+    table = table + "</tbody>";
+    data_cache = cdata;
+    data_cache_type = DataType.VERSION_BY_DATE;
+    var options = getGraphOptions();
+    updateGraph(options.g, options.u, options.d);
+    $('#contribution-info').html(table);
+    $('#contribution-info').removeClass("d-none");
+    $('#contribution-info').addClass("d-table");
+    $('#chart').removeClass("d-none");
+    $('#chart').addClass("d-block");
+    $('#daterange').removeClass("d-none");
+}
 
+function renderUserStat(name, ts, rs) {
+    return '<tr class="border-top"><th scope="row">' + name + '</th>' +
+    '<td>번역</td><td>' + ts.approved + '</td><td>' + ts.rejected + '</td><td>' + ts.translated + '</td><td>' + ts.needReview + '</td></tr>' +
+    '<tr><th scope="row"></th>' +
+    '<td>검수</td><td>' + rs.approved + '</td><td>' + rs.rejected + '</td><td>' + rs.translated + '</td><td>' + rs.needReview + '</td></tr>';
+}
+
+function renderDateStat(date, stat) {
+    var n = nr = t = a = r = 0;
+    if(stat.has("New")) n = stat.get("New");
+    if(stat.has("NeedReview")) nr = stat.get("NeedReview");
+    if(stat.has("Translated")) t = stat.get("Translated");
+    if(stat.has("Approved")) a = stat.get("Approved");
+    if(stat.has("Rejected")) r = stat.get("Rejected");
+    return '<tr class="border-top"><th scope="row">' + date + '</th>' +
+    '<td>' + n + '</td><td>' + nr + '</td><td>' + t + '</td><td>' + a + '</td><td>' + r + '</td></tr>';
 }
 
 function renderStat(name, stat, borderTop) {
@@ -400,10 +502,12 @@ function renderStat(name, stat, borderTop) {
     }
     return s +
     '<th scope="row">'+ name + '</th>' +
-    '<td>'+ stat.unit + '</td><td>'+ stat.total + '</td><td>'+ stat.untranslated + '</td><td>' + stat.needReview + '</td><td>' + stat.rejected + '</td><td>'+ stat.approved + '</td><td>'+ stat.translated + '</td><td>' + stat.lastTranslated + '</td></tr>';
+    '<td>'+ stat.unit + '</td><td>' + stat.total + '</td><td>'+ stat.untranslated + '</td><td>' + stat.needReview + '</td><td>' + stat.translated + '</td><td>'+ stat.approved + '</td><td>'+ stat.rejected + '</td><td>' + stat.lastTranslated + '</td></tr>';
 }
 
 function checkValues() {
+    $('label').removeClass('text-danger');
+    $('input').removeClass('is-invalid');
     var check = true;
     var required = [ 'username', 'userToken', 'projectName', 'versionName' ]
     $.each(required, function(_, r) {
@@ -453,7 +557,7 @@ function checkValues() {
         });
         check = false;
     }
-    if(dateInputed && $('#targetUsername').val() != '') {
+    if(!dateInputed && $('#targetUsername').val() != '') {
         $("label[for='targetUsername']").addClass('text-danger');
         $('#targetUsername').addClass('is-invalid');
         $('#targetUsername').popover({
