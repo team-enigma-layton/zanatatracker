@@ -38,7 +38,7 @@ $('#submit').click(function() {
         var dataArray = new Array();
         var userSize = tu.length;
         $.each(tu, function(_, u) {
-            var url = v('url') + 'rest/stats/project/' + v('projectName') + '/version/' + v('versionName') + '/contributor/' + u + '/' + v('date');
+            var url = v('url') + 'rest/stats/project/' + v('projectName') + '/version/' + v('versionName') + '/contributor/' + u.trim() + '/' + v('date');
             $.ajax({
                 url: url,
                 headers: {
@@ -261,7 +261,7 @@ function updateGraph(graphType, unitType, dateRangeType) {
             data: makeDataset(data_cache, data_cache_type, graphType, unitType, dateRangeType),
             options: {
                 legend: { labels: { fontColor: 'white' } },
-                title: { display: true, text: unitTypeString + " 기준 통계(" + graphTypeString + ")", fontColor: 'white' },
+                title: { display: false, text: unitTypeString + " 기준 통계(" + graphTypeString + ")", fontColor: 'white' },
                 tooltips: { mode: 'index', intersect: false },
                 responsive: true,
                 scales: { 
@@ -302,10 +302,113 @@ function updateGraph(graphType, unitType, dateRangeType) {
                 }
             }
         });
+    } else if(data_cache_type == DataType.VERSION_BY_DATE) {
+        var range = "1일";
+        if(dateRangeType == DateRangeType.BY_WEEK) range = "7일";
+        if(dateRangeType == DateRangeType.BY_MONTH) range = "30일";
+        chart_instance = new Chart(ctx, {
+            type: 'line',
+            data: makeDataset(data_cache, data_cache_type, graphType, unitType, dateRangeType),
+            options: {
+                legend: { labels: { fontColor: 'white' } },
+                title: { display: false, text: unitTypeString + " 기준 통계(" + graphTypeString + ")", fontColor: 'white' },
+                tooltips: { mode: 'index', intersect: false },
+                responsive: true,
+                scales: { 
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'white',
+                            showLabelBackdrop: false
+                        },
+                        gridLines: {
+                            color: 'rgba(255, 255, 255, 0.2)'
+                        },
+                        pointLabels: {
+                            fontColor: 'white'
+                        },
+                        angleLines: {
+                            color: 'white'
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'white',
+                            showLabelBackdrop: false
+                        },
+                        gridLines: {
+                            color: 'rgba(255, 255, 255, 0.2)'
+                        },
+                        pointLabels: {
+                            fontColor: 'white'
+                        },
+                        angleLines: {
+                            color: 'white'
+                        }
+                    }],
+                }
+            }
+        });
+    } else if(data_cache_type == DataType.USERS) {
+        chart_instance = new Chart(ctx, {
+            type: 'bar',
+            data: makeDataset(data_cache, data_cache_type, graphType, unitType, dateRangeType),
+            options: {
+                legend: { labels: { fontColor: 'white' } },
+                title: { display: false, text: unitTypeString + " 기준 통계(" + graphTypeString + ")", fontColor: 'white' },
+                tooltips: { mode: 'index', intersect: false },
+                responsive: true,
+                scales: { 
+                    xAxes: [{
+                        maxBarThickness: 30,
+                        stacked: true,
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'white',
+                            showLabelBackdrop: false
+                        },
+                        gridLines: {
+                            color: 'rgba(255, 255, 255, 0.2)'
+                        },
+                        pointLabels: {
+                            fontColor: 'white'
+                        },
+                        angleLines: {
+                            color: 'white'
+                        }
+                    }],
+                    yAxes: [{
+                        stacked: true,
+                        position: 'left',
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: 'white',
+                            showLabelBackdrop: false
+                        },
+                        gridLines: {
+                            color: 'rgba(255, 255, 255, 0.2)'
+                        },
+                        pointLabels: {
+                            fontColor: 'white'
+                        },
+                        angleLines: {
+                            color: 'white'
+                        }
+                    }],
+                }
+            }
+        });
     }
 }
 
 function makeDataset(data, dataType, graphType, unitType, dateRangeType) {
+    var dataset = {
+        'labels': ['foo', 'bar' ],
+        'datasets': [
+            { 'label': 'foo', data: [0, 1] }
+        ]
+    };
     if(dataType == DataType.VERSION_GLOBAL) {
         var labels = new Array();
         var needReview = new Array();
@@ -350,7 +453,7 @@ function makeDataset(data, dataType, graphType, unitType, dateRangeType) {
                 }
             });
         });
-        var dataset = {
+        dataset = {
             'labels': labels,
             'datasets': [
                 { 'label': '번역됨', 'data': translated, 'backgroundColor': '#5CCA7B' },
@@ -360,14 +463,76 @@ function makeDataset(data, dataType, graphType, unitType, dateRangeType) {
                 { 'label': '미번역', 'data': untranslated, 'backgroundColor': '#EEEEEE' }
             ]
         };
-        return dataset;
     } else if(dataType == DataType.VERSION_BY_DATE) {
-        //TO-DO: Make Graph for Version by Date Type.
+        var labels = new Array();
+        var nr = new Array();
+        var r = new Array();
+        var a = new Array();
+        var t = new Array();
+        var n = new Array();
+        data.forEach(function(stat, date, _) {
+            labels.push(date);
+            n.push(stat.has("New") ? stat.get("New") : 0);
+            nr.push(stat.has("NeedReview") ? stat.get("NeedReview") : 0);
+            t.push(stat.has("Translated") ? stat.get("Translated") : 0);
+            a.push(stat.has("Approved") ? stat.get("Approved") : 0);
+            r.push(stat.has("Rejected") ? stat.get("Rejected") : 0);
+        });
+        dataset = {
+            'labels': labels,
+            'datasets': [
+                { 'label': '번역됨', 'data': t, 'backgroundColor': '#5CCA7B', 'borderColor': '#5CCA7B', 'fill': false },
+                { 'label': '확인 필요', 'data': nr, 'backgroundColor': '#E9DF1B', 'borderColor': '#E9DF1B', 'fill': false },
+                { 'label': '검증됨', 'data': a, 'backgroundColor': '#03A6D7', 'borderColor': '#03A6D7', 'fill': false },
+                { 'label': '거부', 'data': r, 'backgroundColor': '#FFA800', 'borderColor': '#FFA800', 'fill': false },
+                { 'label': '신규', 'data': n, 'backgroundColor': '#EEEEEE', 'borderColor': '#EEEEEE', 'fill': false }
+            ]
+        };
+    } else if(dataType == DataType.USERS) {
+        var labels = new Array();
+        var t_nr = new Array();
+        var t_r = new Array();
+        var t_a = new Array();
+        var t_t = new Array();
+        var r_r = new Array();
+        var r_a = new Array();
+        $.each(data, function(_, user) {
+            var ts = {
+                approved: 0,
+                rejected: 0,
+                translated: 0,
+                needReview: 0
+            };
+            var rs = {
+                approved: 0,
+                rejected: 0
+            }
+            if(user.contributions.length > 0) {
+                if(user.contributions[0].hasOwnProperty("translation-stats")) ts = user.contributions[0]['translation-stats'];
+                if(user.contributions[0].hasOwnProperty("review-stats")) rs = user.contributions[0]['review-stats'];
+            }
+            labels.push(user.username);
+            t_nr.push(ts.needReview);
+            t_t.push(ts.translated);
+            r_r.push(rs.rejected);
+            r_a.push(rs.approved);
+        });
+        dataset = {
+            'labels': labels,
+            'datasets': [
+                { 'label': '번역됨', 'data': t_t, 'backgroundColor': '#5CCA7B', 'borderColor': '#5CCA7B', 'fill': false },
+                { 'label': '확인 필요', 'data': t_nr, 'backgroundColor': '#E9DF1B', 'borderColor': '#E9DF1B', 'fill': false },
+                { 'label': '검증됨', 'data': r_a, 'backgroundColor': '#03A6D7', 'borderColor': '#03A6D7', 'fill': false },
+                { 'label': '거부', 'data': r_r, 'backgroundColor': '#FFA800', 'borderColor': '#FFA800', 'fill': false }
+            ]
+        };
     }
+    return dataset;
 }
 
 
 function updateUserStatics(data) {
+    console.log(JSON.stringify(data));
     var table = '<thead><tr>' +
     '<th scope="col">유저 이름</th>' +
     '<th scope="col">기여 형식</th><th scope="col">검증됨</th>' +
@@ -381,13 +546,11 @@ function updateUserStatics(data) {
         };
         var rs = {
             approved: 0,
-            rejected: 0,
-            translated: 0,
-            needReview: 0
+            rejected: 0
         }
         if(user.contributions.length > 0) {
             if(user.contributions[0].hasOwnProperty("translation-stats")) ts = user.contributions[0]['translation-stats'];
-            if(user.contributions[0].hasOwnProperty("review-stats")) ts = user.contributions[0]['review-stats'];
+            if(user.contributions[0].hasOwnProperty("review-stats")) rs = user.contributions[0]['review-stats'];
         }
         table = table + renderUserStat(user.username, ts, rs);
     });
@@ -479,7 +642,7 @@ function renderUserStat(name, ts, rs) {
     return '<tr class="border-top"><th scope="row">' + name + '</th>' +
     '<td>번역</td><td>' + ts.approved + '</td><td>' + ts.rejected + '</td><td>' + ts.translated + '</td><td>' + ts.needReview + '</td></tr>' +
     '<tr><th scope="row"></th>' +
-    '<td>검수</td><td>' + rs.approved + '</td><td>' + rs.rejected + '</td><td>' + rs.translated + '</td><td>' + rs.needReview + '</td></tr>';
+    '<td>검수</td><td>' + rs.approved + '</td><td>' + rs.rejected + '</td><td>-</td><td>-</td></tr>';
 }
 
 function renderDateStat(date, stat) {
